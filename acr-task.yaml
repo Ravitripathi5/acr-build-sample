@@ -13,7 +13,8 @@ steps:
     id: start-test-container
 
   # Wait (FINAL FIX)
-  - cmd: sleep 10
+  - cmd: |
+    /bin/sh -c "sleep 10"
     id: wait-for-startup
     image: mcr.microsoft.com/azure-cli
 
