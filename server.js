@@ -4,7 +4,7 @@ const port = process.env.PORT || 3000;
 
 app.get('/', (req, res) => {
   res.json({ 
-    message: 'Hello from ACR Build!',
+    message: 'Hello from ACR Build - Trigger Test!',
     version: process.env.BUILD_VERSION || '1.0.0',
     timestamp: new Date().toISOString()
   });
