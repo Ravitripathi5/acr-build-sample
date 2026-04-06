@@ -5,22 +5,22 @@ steps:
   - build: -t {{.Run.Registry}}/webapp:{{.Run.ID}} -t {{.Run.Registry}}/webapp:latest .
     id: build-app
 
-  - detach: true
-    alias: test-app
-    image: {{.Run.Registry}}/webapp:{{.Run.ID}}
+  - cmd: docker run -d --name test-container -p 3001:3000 {{.Run.Registry}}/webapp:{{.Run.ID}}
     id: start-test-container
 
-  - cmd: mcr.microsoft.com/azure-cli sh -c "sleep 10"
+  - cmd: ["sleep","10"]
     id: wait-for-startup
+    image: mcr.microsoft.com/azure-cli
 
-  - cmd: mcr.microsoft.com/azure-cli sh -c "curl -f http://test-app:3000/health"
+  - cmd: ["curl","-f","http://localhost:3001/health"]
     id: health-check
+    image: mcr.microsoft.com/azure-cli
 
-  - cmd: mcr.microsoft.com/azure-cli sh -c "docker exec start-test-container npm test"
+  - cmd: docker exec test-container npm test
     id: run-tests
     when: ['health-check']
 
-  - cmd: mcr.microsoft.com/azure-cli sh -c "docker stop start-test-container && docker rm start-test-container"
+  - cmd: docker stop test-container && docker rm test-container
     id: cleanup
     when: ['run-tests']
 
@@ -29,3 +29,8 @@ steps:
       - {{.Run.Registry}}/webapp:latest
     id: push-images
     when: ['cleanup']
+
+env:
+  - BUILD_VERSION={{.Run.ID}}
+  - BUILD_DATE={{.Date}}
+  - GIT_COMMIT={{.Commit}}
