@@ -5,22 +5,25 @@ steps:
   - build: -t {{.Run.Registry}}/webapp:{{.Run.ID}} -t {{.Run.Registry}}/webapp:latest .
     id: build-app
 
-  - cmd: docker run -d --name test-container -p 3001:3000 {{.Run.Registry}}/webapp:{{.Run.ID}}
+  # Note: In ACR Tasks, we usually use 'detach: true' instead of 'docker run -d'
+  - detach: true
+    alias: test-app
+    image: {{.Run.Registry}}/webapp:{{.Run.ID}}
     id: start-test-container
 
-  - cmd: /bin/sh -c "sleep 10"
+  - cmd: ["sh", "-c", "sleep 10"]
     id: wait-for-startup
     image: mcr.microsoft.com/azure-cli
 
-  - cmd: /bin/sh -c "curl -f http://localhost:3001/health"
+  - cmd: ["sh", "-c", "curl -f http://test-app:3000/health"]
     id: health-check
     image: mcr.microsoft.com/azure-cli
 
-  - cmd: docker exec test-container npm test
+  - cmd: ["sh", "-c", "docker exec start-test-container npm test"]
     id: run-tests
     when: ['health-check']
 
-  - cmd: docker stop test-container && docker rm test-container
+  - cmd: ["sh", "-c", "docker stop start-test-container && docker rm start-test-container"]
     id: cleanup
     when: ['run-tests']
 
@@ -29,8 +32,3 @@ steps:
       - {{.Run.Registry}}/webapp:latest
     id: push-images
     when: ['cleanup']
-
-env:
-  - BUILD_VERSION={{.Run.ID}}
-  - BUILD_DATE={{.Date}}
-  - GIT_COMMIT={{.Commit}}
