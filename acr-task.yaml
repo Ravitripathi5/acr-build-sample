@@ -9,7 +9,7 @@ steps:
          {{.Run.Registry}}/webapp:{{.Run.ID}}
     id: start-test-container
     
-  - cmd: sleep 10
+  - cmd: /bin/sh -c "sleep 10"
     id: wait-for-startup
     
   - cmd: |
