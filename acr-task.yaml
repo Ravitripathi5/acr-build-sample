@@ -9,8 +9,9 @@ steps:
          {{.Run.Registry}}/webapp:{{.Run.ID}}
     id: start-test-container
     
-  - cmd: /bin/sh -c "sleep 10"
+  - cmd: sh -c "sleep 10"
     id: wait-for-startup
+    image: mcr.microsoft.com/azure-cli
     
   - cmd: |
       curl -f http://localhost:3001/health || exit 1
