@@ -2,14 +2,14 @@ version: v1.1.0
 stepTimeout: 300
 
 steps:
-  - cmd: ["echo","ACR Task Started"]
+  - cmd: echo "ACR Task Started"
     id: step1
     image: mcr.microsoft.com/azure-cli
 
-  - cmd: ["sleep","5"]
+  - cmd: sleep 5
     id: step2
     image: mcr.microsoft.com/azure-cli
 
-  - cmd: ["echo","ACR Task Completed Successfully"]
+  - cmd: echo "ACR Task Completed Successfully"
     id: step3
     image: mcr.microsoft.com/azure-cli
