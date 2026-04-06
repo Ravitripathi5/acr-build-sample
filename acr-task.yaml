@@ -19,7 +19,8 @@ steps:
     image: mcr.microsoft.com/azure-cli
 
   # Health check (FINAL FIX)
-  - cmd: curl -f http://localhost:3001/health
+  - cmd: |
+    /bin/sh -c "curl -f http://localhost:3001/health"
     id: health-check
     image: mcr.microsoft.com/azure-cli
 
