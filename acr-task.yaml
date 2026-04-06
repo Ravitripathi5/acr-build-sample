@@ -2,41 +2,28 @@ version: v1.1.0
 stepTimeout: 600
 
 steps:
-  # Build image
-  - build: -t {{.Run.Registry}}/webapp:{{.Run.ID}} 
-           -t {{.Run.Registry}}/webapp:latest .
+  - build: -t {{.Run.Registry}}/webapp:{{.Run.ID}} -t {{.Run.Registry}}/webapp:latest .
     id: build-app
 
-  # Run container
-  - cmd: docker run -d --name test-container -p 3001:3000 
-         {{.Run.Registry}}/webapp:{{.Run.ID}}
+  - cmd: docker run -d --name test-container -p 3001:3000 {{.Run.Registry}}/webapp:{{.Run.ID}}
     id: start-test-container
 
-  # Wait (FINAL FIX)
-  - cmd: |
-    /bin/sh -c "sleep 10"
+  - cmd: /bin/sh -c "sleep 10"
     id: wait-for-startup
     image: mcr.microsoft.com/azure-cli
 
-  # Health check (FINAL FIX)
-  - cmd: |
-    /bin/sh -c "curl -f http://localhost:3001/health"
+  - cmd: /bin/sh -c "curl -f http://localhost:3001/health"
     id: health-check
     image: mcr.microsoft.com/azure-cli
 
-  # Run tests
   - cmd: docker exec test-container npm test
     id: run-tests
     when: ['health-check']
 
-  # Cleanup
-  - cmd: |
-      docker stop test-container
-      docker rm test-container
+  - cmd: docker stop test-container && docker rm test-container
     id: cleanup
     when: ['run-tests']
 
-  # Push images
   - push:
       - {{.Run.Registry}}/webapp:{{.Run.ID}}
       - {{.Run.Registry}}/webapp:latest
