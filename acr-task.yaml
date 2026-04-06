@@ -12,13 +12,13 @@ steps:
          {{.Run.Registry}}/webapp:{{.Run.ID}}
     id: start-test-container
 
-  # Wait for app startup (FIXED)
-  - cmd: sh -c "sleep 10"
+  # Wait (FINAL FIX)
+  - cmd: sleep 10
     id: wait-for-startup
     image: mcr.microsoft.com/azure-cli
 
-  # Health check
-  - cmd: sh -c "curl -f http://localhost:3001/health || exit 1"
+  # Health check (FINAL FIX)
+  - cmd: curl -f http://localhost:3001/health
     id: health-check
     image: mcr.microsoft.com/azure-cli
 
